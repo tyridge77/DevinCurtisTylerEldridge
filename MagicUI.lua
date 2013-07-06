@@ -123,6 +123,7 @@ local function Particles(OptionalStopBoolean,
         meshx,meshy,meshz,partcount,parttrans,transition,
         transitionpower,x,xx,y,yy,z,zz
 )		
+
         print(p,particlelocation,duration,flicker,addobjects,color,color2,range,healthimpact,meshx,meshy,meshz,partcount,parttrans,transition,transitionpower,x,xx,y,yy,z,zz);
 		moving.Value = true;
         cr(cc(function()wait(duration) if moving.Value == true then moving.Value = false end end))
@@ -324,7 +325,12 @@ local function MagicUIPlay(SettingKeyBind,showing)
 			enterevents[v] = v.MouseEnter:connect(function() 
 				if clicked then return end
 				print('MouseEnter');
-				Description.Text = SettingKeyBind == true and ' THIS WILL BE SET TO KEYBIND: '..CurrentlyAssigning..' '..DescriptionLibrary[name];
+				if SettingKeyBind == true then
+				Description.Text = 
+				' *Will be set to keybind '..CurrentlyAssigning:upper()..'*'..DescriptionLibrary[name]
+				else
+				Description.Text = DescriptionLibrary[name];
+				end
 				v.TextTransparency = 0;
 				school.TextTransparency = 0;
 				manacost.TextTransparency = 0;
