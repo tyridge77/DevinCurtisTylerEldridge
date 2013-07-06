@@ -1,6 +1,9 @@
+wait(1)
 --Particle Engine 
+-- July 05, 2013, 11:52 PM
 
 
+local entering = nil;
 local Players = game:GetService('Players')
 local Lighting = game:GetService('Lighting');
 local CameraComps = Lighting.CameraComps;
@@ -8,15 +11,37 @@ local Player = Players.LocalPlayer;
 local human = Player.Character.Humanoid;
 local PlayerGui = Player.PlayerGui;
 local MagicUI = PlayerGui:WaitForChild('Magic');
+local BG = MagicUI:WaitForChild('BG')
 local MagicUIShowing = false;
 local mouse = Player:GetMouse();
 local moving = Instance.new('BoolValue')
 moving.Value = false;
+
+local CharacterMenu = PlayerGui:WaitForChild('CharMenu');
+local ActionBar = CharacterMenu:WaitForChild('ActionBar');
+local ActionBarChildren = ActionBar:GetChildren();
+local Panel = MagicUI.Panel;
+local Description = Panel:WaitForChild('Description');
+
+local Background = CharacterMenu:WaitForChild('Background');
+local Buffs = CharacterMenu:WaitForChild('Buffs');
+local PartyGui = CharacterMenu:WaitForChild('PartyGui');
+local Main = CharacterMenu:WaitForChild('Main');
+local enterevents = {};
+local clickevents = {};
+local leaveevents = {};
+local KeyBinds = {};
+local CurrentlyAssigning = nil;
 local mr = math.random;
 local cam = Workspace.CurrentCamera;
 local string_to_boolean = {['true']=true,['false']=false};
 local cr = coroutine.resume;
 local cc = coroutine.create;
+local DescriptionLibrary = {
+['Call of Keilfur'] = ' Summons orbs to heal all around you, including yourself.',
+['Illuminating Orb'] = ' Casts an orb to brighten the radius around you in a dark environment.',
+["Esstin's Sanctum"] = ' Blinds your foes by spawning a series of hindering clouds'
+}
 local SpellLibrary = {
 ['Call of Keilfur'] = 
 [=[
@@ -57,7 +82,7 @@ dust/
         MeshZ: 1/
         PartCount: 1/
         PartTransparency: .6/
-        TransitionTimeToFullPower: 1/
+        TransitionTimeToFullPower: .5/
         FullPower: 1000/
         RandomX1: 0/
         RandomX2: 0/
@@ -65,15 +90,41 @@ dust/
         RandomY2: 6/
         RandomZ1: 0/
         RandomZ2: 0
+]=],
+["Esstin's Sanctum"] = 
+[=[
+dust/
+	 	Duration:20 seconds/
+        Flicker:False/
+        AddObjects:false/
+        BrickColor:Light stone grey/
+        LightColor:Deep blue/
+        Range: 0/
+        HealthImpact: 0/
+        MeshX: 15/
+        MeshY: 15/
+        MeshZ: 15/
+        PartCount: 40/
+        PartTransparency: .3/
+        TransitionTimeToFullPower: .5/
+        FullPower: 1000/
+        RandomX1: -20/
+        RandomX2: 20/
+        RandomY1: 3/
+        RandomY2: 6/
+        RandomZ1: -20/
+        RandomZ2: 20
 ]=]
 }
+
+
 local function Particles(OptionalStopBoolean,
         p,particlelocation,duration,flicker,addobjects,color,color2,range,healthimpact,
         meshx,meshy,meshz,partcount,parttrans,transition,
         transitionpower,x,xx,y,yy,z,zz
 )		
         print(p,particlelocation,duration,flicker,addobjects,color,color2,range,healthimpact,meshx,meshy,meshz,partcount,parttrans,transition,transitionpower,x,xx,y,yy,z,zz);
-		moving.Value = false;
+		moving.Value = true;
         cr(cc(function()wait(duration) if moving.Value == true then moving.Value = false end end))
 		if OptionalStopBoolean ~= nil then
 			OptionalStopBoolean.Changed:connect(function()
@@ -169,7 +220,7 @@ local function Particles(OptionalStopBoolean,
 		moving.Changed:connect(function()
 			if moving.Value == false then CutParts() end
 		end)
-        while(moving) do
+        while(moving.Value == true) do
                 for _,v in pairs(parts) do
                         bf = v:FindFirstChild('DustFloat') and v.DustFloat or Instance.new('BodyPosition');
                         bf.position = p.Position +
@@ -198,18 +249,51 @@ CreateEffects = function(OptionalStopBoolean,part,particlelocation,msg)
         end
 end
 
-
-local function MagicUIPlay(showing)
-	if MagicUIDebounce then return end
-	MagicUIDebounce = true;
-	if showing == true then 
+local function DisconnectAll(...)
+local tables = {...};
+	for _,v in pairs(tables) do 
+		for i,vv in pairs(v) do 
+			print('Disconnected: '..type(vv)) vv:disconnect();
+		end
+	end
+end
+local HideUI = function()
+		ActionBar.Visible = true;
+		Background.Visible = false;
+		Buffs.Visible = true;
+		PartyGui.Visible = true;
+		Main.Visible = true;
+		DisconnectAll(enterevents,clickevents,leaveevents);
+		BG.BackgroundTransparency = 0;
 		MagicUIShowing = false;
-		for _,v in pairs(MagicUI:GetChildren()) do v.Visible = false end
+		for _,v in pairs(MagicUI:GetChildren()) do  if v ~= BG then v.Visible = false end end
 		cam.CameraSubject = human
 		cam.CameraType = "Custom"
-		--Player.CameraMode = "LockFirstPerson"	
 		pcall(function() cam.MagicUIModel:Destroy() end)
+		for i = 1, 10 do wait(0)
+			BG.BackgroundTransparency = BG.BackgroundTransparency + .1;
+		end
+		BG.BackgroundTransparency = 1;
+		--Player.CameraMode = "LockFirstPerson"	
+end
+local function MagicUIPlay(SettingKeyBind,showing)
+	if MagicUIDebounce then return end
+	Description.Text = SettingKeyBind == true and ' CLICK A SPELL TO ASSIGN A KEYBIND TO IT' or '';
+	MagicUIDebounce = true;
+	if showing == true then 
+		HideUI()
 	elseif showing == false then
+		ActionBar.Visible = false;
+		Background.Visible = false;
+		Buffs.Visible = false;
+		PartyGui.Visible = false;
+		Main.Visible = false;
+		BG.BackgroundTransparency = 1;
+		for i = 1, 10 do wait(0)
+			BG.BackgroundTransparency = BG.BackgroundTransparency - .1;
+		end
+		wait(1)
+		BG.BackgroundTransparency = 1
 		MagicUIShowing = true;
 		for _,v in pairs(MagicUI:GetChildren()) do v.Visible = true; end
 		local Model = CameraComps.MagicUIModel:clone();
@@ -222,7 +306,6 @@ local function MagicUIPlay(showing)
 		cam.CoordinateFrame = campart.CFrame
 		cam.Focus = campart.CFrame
 		Model.Parent,campart.Parent = cam,cam;
-		local Panel = MagicUI.Panel;
 		local Name,School,ManaCost = Panel.Names,Panel.School,Panel.ManaCost;
 		local animating = {};
 			local cutanimation = function(stopbool,v,school,manacost) print('Cutting Animation')
@@ -238,7 +321,10 @@ local function MagicUIPlay(showing)
 			local stopbool = Instance.new('BoolValue')
 			local name = v.Name;
 			local school,manacost = School[name],ManaCost[name];
-			local enter = v.MouseEnter:connect(function() 
+			enterevents[v] = v.MouseEnter:connect(function() 
+				if clicked then return end
+				print('MouseEnter');
+				Description.Text = SettingKeyBind == true and ' THIS WILL BE SET TO KEYBIND: '..CurrentlyAssigning..' '..DescriptionLibrary[name];
 				v.TextTransparency = 0;
 				school.TextTransparency = 0;
 				manacost.TextTransparency = 0;
@@ -247,16 +333,38 @@ local function MagicUIPlay(showing)
 				manacost.BackgroundTransparency = .8;
 				local spellinfo = SpellLibrary[name]:gsub('PartTransparency:%s*(.-)%s*/','PartTransparency: 0/');
 				CreateEffects(stopbool,region,cam,spellinfo);
-				print('Not Animating')
 			end)
-			local leave = v.MouseLeave:connect(function()cutanimation(stopbool,v,school,manacost) end)
+			clickevents[v] = v.MouseButton1Click:connect(function()
+				clicked = true;
+				if SettingKeyBind == true then
+					KeyBinds[CurrentlyAssigning] = v.Name;
+					HideUI();
+					cutanimation(stopbool,v,school,manacost)
+				else
+					HideUI();
+					cutanimation(stopbool,v,school,manacost)
+					CreateEffects(nil,human.Parent.Torso,Workspace,SpellLibrary[name]);
+				end
+				clicked = nil;
+			end)
+			leaveevents[v] = v.MouseLeave:connect(function()Description.Text = '';cutanimation(stopbool,v,school,manacost) end)
 		end
 		wait(3)
 	end
 	MagicUIDebounce = nil;
 end
 
-local key_down = mouse.KeyDown:connect(function(key)
-	if key == 'm' then MagicUIPlay(MagicUIShowing);
+-- Event handling
+
+
+local key_down = mouse.KeyDown:connect(function(key) print(key)
+	if key == 'm' then MagicUIPlay(false,MagicUIShowing);
+	elseif KeyBinds[key] then moving.Value = false; CreateEffects(nil,human.Parent.Torso,Workspace,SpellLibrary[KeyBinds[key]]);
 	end
 end)
+for _,v in pairs(ActionBarChildren) do if not v:isA('ImageButton') then return end
+	local KeySelected = v.MouseButton1Click:connect(function()
+		CurrentlyAssigning = v.Name;
+		MagicUIPlay(true,MagicUIShowing);
+	end)
+end
