@@ -1,6 +1,6 @@
 wait(1)
 --Particle Engine 
--- July 05, 2013, 11:52 PM
+-- July 05, 2013, 1:23
 
 
 local entering = nil;
