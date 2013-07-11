@@ -36,11 +36,9 @@ Automatic Party Channel: X
 
 Guilds[Fighter, Mage, etc.. Would give bonuses for doing missions?]: X
 
-Draggable Chat GUI: X
+Party Quit on Player Leave/Character(humanoid) Death: O
 
-Party Quit on Player Leave/Character(humanoid) Death: X
-
-Update the Chat GUI Buttons/Functions[Channels button actually does something, etc]: X
+Update the Chat GUI Buttons/Functions[Channels button actually does something, etc]: WIP
 
  * GAMEPLAY *
  
