@@ -36,7 +36,7 @@ Automatic Party Channel: X
 
 Guilds[Fighter, Mage, etc.. Would give bonuses for doing missions?]: X
 
-Party Quit on Player Leave/Character(humanoid) Death: O
+Party Quit on Player Leave/Character(humanoid) Death: WIP
 
 Update the Chat GUI Buttons/Functions[Channels button actually does something, etc]: WIP
 
@@ -76,12 +76,6 @@ Dialog Engine: X
  * ATMOSPHERE *
 
 Detailed Areas/Builder-Hiring/>Finding Dedicated people<: WIP 
- Ik lol.
- How do people so easily get builders for their games? It's like, dafuq is this?! srsly..
- Dude
- I want these trees
- http://www.roblox.com/Siberian-Foliage-Simulator-place?id=117183805
- 
  
  Scheduled NPCS/Radiant AI mimic? : X
 
