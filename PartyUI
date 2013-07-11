@@ -1,0 +1,283 @@
+local sp = script.Parent
+local p = sp.Parent.Parent.Parent
+p:WaitForChild("Stats")
+local deb = 0
+local reciever;
+local file = game.Workspace["Server_Client_Communications"].PartyInviteTransfer
+local file2 = game.Lighting.GameFiles.Parties
+local partyv = script.Party
+local cc1;
+local cc2;
+local cc3;
+local cc4;
+local cc5;
+local c1;
+local c2;
+
+function newparty()
+  if file2:FindFirstChild(p.Name) == nil then
+	local i = Instance.new("StringValue", file2)
+	i.Name = p.Name
+	i.Value = p.Stats.CharacterName.Value
+	local c = i:clone()
+	c.Parent = i
+	return i
+	else
+		return file:FindFirstChild(p.Name)
+	end
+end
+
+local function findplayer(CN)
+	local found = false
+	for i,v in pairs(game.Players:GetChildren()) do
+		if v.Stats.CharacterName.Value == CN then
+			found = true
+			return v	
+		end	
+	end
+	if found == false then return nil end
+end
+
+local function newreciever()
+	if file:FindFirstChild(p.Name) == nil then
+		local temporary = Instance.new("ObjectValue", file)
+		temporary.Name = p.Name
+		return temporary
+	else
+		return file:FindFirstChild(p.Name)
+	end
+end
+
+local function resetparty()
+	for i,v in pairs(sp.Background:GetChildren()) do
+		v.CN.Text = "NA"
+		v.ClassLabel.Image = ""
+	end
+	sp.Config.Menu["1"].Text = "Invite"
+	sp.Config.Menu["1"].Menu.Visible = false
+	sp.Config.Menu.Visible = false
+end
+
+local function addmember(p)
+	count = 1
+	for i = 1, 3 do
+	local find = script.Parent.Background:FindFirstChild(tostring(count))
+		if find.CN.Text == "NA" then
+			find.CN.Text = p
+			break
+		else
+			count = count + 1
+		end
+	end
+end
+
+local function sendinvite(player, frame)
+local gui = sp.PartyInv:clone()
+local objp = file:FindFirstChild(player.Name)
+for i,v in pairs(frame:GetChildren()) do
+	if v.Name ~= "List" then
+		v:Destroy()
+	end
+end
+frame.Visible = false
+gui.Background.From.Text = p.Stats.CharacterName.Value
+gui.Parent = objp
+gui.Background.Visible = true
+objp.Value = gui
+end
+
+local function populate(frame)
+if deb == 0 then
+deb = 1
+frame.Size = UDim2.new(0,150,0,30)
+for i,v in pairs(frame:GetChildren()) do
+	if v.Name ~= "List" then
+		v:Destroy()		
+	end	
+end
+local f = frame.List
+local pos = 30
+	for i,v in pairs(game.Players:GetChildren()) do
+		if v ~= p then
+			local l = f:clone()
+			l.Text = ""
+			l.Parent = frame
+			l:TweenPosition(UDim2.new(0,5,0,pos),Out, Quad, .2, false, nil)
+			frame:TweenSize(frame.Size + UDim2.new(0,0,0,25),Out, Quad, .2, false, nil)
+			l.Name = "Choice"
+			local temp = Instance.new("ObjectValue", l)
+			temp.Value = v
+			temp.Name = "Player"
+			pos = pos + 25
+			wait(.2)
+			l.Text = v.Stats.CharacterName.Value
+		end
+	end
+end
+deb = 0
+end
+
+function startparty()
+partyv.Value = newparty()
+-- Party leader event "Added"
+cc1 = partyv.Value.ChildAdded:connect(function (child)
+	if partyv.Value.Parent == file2 then
+		print"CHILD ADDED PARTY LEADER"
+		resetparty()
+		for i,v in pairs(partyv.Value:GetChildren()) do
+			if v.Name ~= p.Name then
+				addmember(v.Value)
+			end			
+		end
+	end
+end)
+-- Party leader event "Removed"
+cc2 = partyv.Value.ChildRemoved:connect(function (child)
+	if partyv.Value.Parent == file2 then
+		print"CHILD REMOVED PARTY LEADER"
+		resetparty()
+		for i,v in pairs(partyv.Value:GetChildren()) do
+			if v.Name ~= p.Name then
+				addmember(v.Value)
+			end			
+		end
+	end	
+end)
+-- Party member population
+cc3 = partyv.Value.AncestryChanged:connect(function ()
+	if partyv.Value.Parent ~= nil then
+		-- Child removed party member
+		cc4 = partyv.Value.Parent.ChildRemoved:connect(function (child)
+			print"CHILD REMOVED PARTY MEMBER"
+			resetparty()
+			for i,v in pairs(partyv.Value.Parent:GetChildren()) do
+				if v.Name ~= p.Name then
+					addmember(v.Value)
+				end			
+			end
+		end)
+		-- Child added party member
+		cc5 = partyv.Value.Parent.ChildAdded:connect(function (child)
+			print"CHILD ADDED PARTY MEMBER"
+			resetparty()
+			for i,v in pairs(partyv.Value.Parent:GetChildren()) do
+				if v.Name ~= p.Name then
+					addmember(v.Value)
+				end			
+			end
+		end)
+		----
+		resetparty()
+		sp.Config.Menu["1"].Text = "Invite[Disabled]"
+		for i,v in pairs(partyv.Value:GetChildren()) do
+			if v.Name ~= p.Name then
+				v:Destroy()
+			end
+		end
+		for i,v in pairs(partyv.Value.Parent:GetChildren()) do
+			if v.Name ~= p.Name then
+				addmember(v.Value)
+			end			
+		end
+	else
+		print"Resetting Party.."
+		resetparty()
+		cc1:disconnect();
+		cc2:disconnect();
+		cc3:disconnect();
+		if cc4 ~= nil then
+			cc4:disconnect();
+			cc5:disconnect();
+		end
+		startparty()
+	end
+end)
+end
+startparty()
+
+-- Recieve invites
+reciever = newreciever()
+reciever.Changed:connect(function ()
+local wat = reciever.Value
+wat.Parent = p.PlayerGui
+c1 = wat.Background.Accept.MouseButton1Down:connect(function ()
+	local val = partyv.Value
+	for i,v in pairs(file2:GetChildren()) do
+		if v.Value == wat.Background.From.Text then
+			val.Parent = v
+			break
+		end
+	end
+	c2:disconnect();
+	wat:Destroy()
+end)
+c2 = wat.Background.Decline.MouseButton1Down:connect(function ()
+	c1:disconnect();
+	c2:disconnect();
+	wat:Destroy()
+end)
+end)
+
+-- UI Menus
+sp.Config.MouseButton1Down:connect(function ()
+	local spm = sp.Config.Menu
+	local tempm;
+	spm.Visible = not spm.Visible
+	for i,v in pairs(spm:GetChildren()) do
+		v.MouseButton1Down:connect(function ()
+			if v.Text == "Invite" then
+				v.Menu.Visible = true
+				populate(v.Menu)
+				tempm = v.Menu
+				for i,v in pairs(v.Menu:GetChildren()) do
+					v.MouseButton1Down:connect(function ()
+						if v:FindFirstChild("Player") then
+						sendinvite(v["Player"].Value, tempm)
+					end end)
+				end
+			elseif v.Text == "Leave Party" then
+				resetparty()
+				cc1:disconnect();
+				cc2:disconnect();
+				cc3:disconnect();
+				if cc4 ~= nil then
+					cc4:disconnect();
+					cc5:disconnect();
+				end
+				for i,v in pairs(partyv.Value:GetChildren()) do
+					v:Destroy()
+				end
+				partyv.Value:Destroy()
+				startparty()
+			end
+		end)
+	end
+end)
+-- Updating the Party UI (Health, etc.)
+	for i,v in pairs(sp.Background:GetChildren()) do
+		wait(.1)
+			v.CN.Changed:connect(function ()
+				print'Change Detected'
+				if v.CN.Text ~= "NA" then
+					print(v.CN.Text)
+					local tplayer = findplayer(v.CN.Text)
+					if tplayer ~= nil then
+						v.Visible = true
+						v.ClassLabel.Image = game.Lighting.Items.ClassPics[tplayer.Stats.Class.Value].Texture
+						v.Health.Text = tplayer.Stats.Health.Value.." / "..tplayer.Stats.Health.MaxHealth.Value
+						tplayer.Stats.Health.Changed:connect(function ()
+						v.Health.Text = tplayer.Stats.Health.Value.." / "..tplayer.Stats.Health.MaxHealth.Value
+						end)
+					elseif tplayer == nil then
+						v.CN.Text = "NA"
+						v.Health.Text = "NA"
+						v.Visible = false
+						end
+					elseif v.CN.Text == "NA" then
+					v.Health.Text = "NA"
+					v.Visible = false
+				end
+			end)
+	end
+
+print'PartyControlEngine loaded..'
