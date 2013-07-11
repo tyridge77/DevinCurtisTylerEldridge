@@ -1,0 +1,101 @@
+X = Not Started
+WIP = Work in Progress
+O = Done
+
+*********************************
+
+* Plot/Lore *
+
+Drawn/Planned out map: X 
+
+Story > Founding of the island and it's gods: X
+
+Rising Action Development: Problems that occur/What you're fighting for: X
+
+BOOKS, Books found across the world: X
+(Books will take a lot of time to write, I can do it once we're publishing the game far in the future)
+
+
+* CHARACTER DEVELOPMENT *
+
+Giant Race [?]:  X
+
+'Dwarf Race [?]: X
+
+Hair: X < You should do this. I failed hard lol
+
+Race Description with custom-lore: X
+
+Fix Skin color issue: X
+
+Fix Hooomans being brokded: X
+
+* Social Interaction *
+
+Automatic Party Channel: X
+
+Guilds[Fighter, Mage, etc.. Would give bonuses for doing missions?]: X
+
+Draggable Chat GUI: X
+
+Party Quit on Player Leave/Character(humanoid) Death: X
+
+Update the Chat GUI Buttons/Functions[Channels button actually does something, etc]: X
+
+ * GAMEPLAY *
+ 
+MONSTER Animation Engine: X
+
+MONSTERS Built with Animation Engine: X
+
+ Cannot drink potions while weapon is out [Hide weapons when drinking]: X
+
+Fixed Pathfinding: X
+
+Fixed Bow [Currently does not Equip]: X
+
+Fatigue Potion: X
+
+ DRAGONS : WIP
+
+Arenas(Large Monsters) : X
+
+Dueling System, Individual Player Versus Player: X
+
+AUCTION HOUSE[Players can sell items they've made or found to other players]: X
+
+Crafting Skills [Blacksmithing, Tailoring, Leatherworking, Alchemy(Potion making), Enchanting[?]: X
+ 
+ Gathering Professions[Mining, Herbalism, Hunting]: X
+
+ MOUNTS: X
+
+Flyable Dragons: X
+
+Dialog Engine: X
+
+
+ * ATMOSPHERE *
+
+Detailed Areas/Builder-Hiring/>Finding Dedicated people<: WIP 
+ Ik lol.
+ How do people so easily get builders for their games? It's like, dafuq is this?! srsly..
+ Dude
+ I want these trees
+ http://www.roblox.com/Siberian-Foliage-Simulator-place?id=117183805
+ 
+ 
+ Scheduled NPCS/Radiant AI mimic? : X
+
+ Random encounters/events: WIP
+
+ Seasons,Weather: X:
+
+Dynamic regions(Loading when appropriate): X
+
+Cozy feel to interior dorms(Glowing fire rather than flickering): X
+
+Regional NPC Animations: X
+
+Terrain-Dependent Sword-Collision-Based - Particle Animation: X
+
