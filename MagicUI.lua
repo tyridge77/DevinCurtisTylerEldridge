@@ -1,6 +1,7 @@
 wait(1)
 --Particle Engine 
 -- July 05, 2013, 1:23
+-- Pic update: July 12, 2013, 9:24 AM; Gojira
 
 
 local entering = nil;
@@ -16,6 +17,7 @@ local MagicUIShowing = false;
 local mouse = Player:GetMouse();
 local moving = Instance.new('BoolValue')
 moving.Value = false;
+local ImgFile = Lighting.Items.Pics.Spells
 
 local CharacterMenu = PlayerGui:WaitForChild('CharMenu');
 local ActionBar = CharacterMenu:WaitForChild('ActionBar');
@@ -38,12 +40,12 @@ local string_to_boolean = {['true']=true,['false']=false};
 local cr = coroutine.resume;
 local cc = coroutine.create;
 local DescriptionLibrary = {
-['Call of Keilfur'] = ' Summons orbs to heal all around you, including yourself.',
-['Illuminating Orb'] = ' Casts an orb to brighten the radius around you in a dark environment.',
-["Esstin's Sanctum"] = ' Blinds your foes by spawning a series of hindering clouds'
+['Tranquility'] = ' Summons orbs to heal all around you, including yourself.',
+['Magelight'] = ' Casts an orb to brighten the radius around you in a dark environment.',
+["Cloak of Shadows"] = ' Blinds your foes by spawning a series of hindering clouds'
 }
 local SpellLibrary = {
-['Call of Keilfur'] = 
+['Tranquility'] = 
 [=[
         dust/
         Duration: 20 seconds/
@@ -56,7 +58,7 @@ local SpellLibrary = {
         MeshX: 1/
         MeshY: 1/
         MeshZ: 1/ 
-        PartCount: 100/
+        PartCount: 25/
         PartTransparency: 0.7/
         TransitionTimeToFullPower: 3/
         FullPower: 500/
@@ -67,7 +69,7 @@ local SpellLibrary = {
         RandomZ1: -20/
         RandomZ2: 20
 ]=],
-['Illuminating Orb'] = 
+['Magelight'] = 
 [=[
 dust/
         Duration:1 minute/
@@ -91,20 +93,20 @@ dust/
         RandomZ1: 0/
         RandomZ2: 0
 ]=],
-["Esstin's Sanctum"] = 
+["Cloak of Shadows"] = 
 [=[
 dust/
 	 	Duration:20 seconds/
         Flicker:False/
         AddObjects:false/
-        BrickColor:Light stone grey/
+        BrickColor:Dark stone grey/
         LightColor:Deep blue/
         Range: 0/
         HealthImpact: 0/
         MeshX: 15/
         MeshY: 15/
         MeshZ: 15/
-        PartCount: 40/
+        PartCount: 20/
         PartTransparency: .3/
         TransitionTimeToFullPower: .5/
         FullPower: 1000/
@@ -344,6 +346,9 @@ local function MagicUIPlay(SettingKeyBind,showing)
 				clicked = true;
 				if SettingKeyBind == true then
 					KeyBinds[CurrentlyAssigning] = v.Name;
+					----------------------------------------  Assigns the picture
+					ActionBar[CurrentlyAssigning].Image = ImgFile[v.Name].Texture
+					----------------------------------------
 					HideUI();
 					cutanimation(stopbool,v,school,manacost)
 				else
