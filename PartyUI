@@ -15,7 +15,7 @@ local c1;
 local c2;
 
 function newparty()
-  if file2:FindFirstChild(p.Name) == nil then
+	if file2:FindFirstChild(p.Name) == nil then
 	local i = Instance.new("StringValue", file2)
 	i.Name = p.Name
 	i.Value = p.Stats.CharacterName.Value
@@ -150,10 +150,12 @@ cc3 = partyv.Value.AncestryChanged:connect(function ()
 		cc4 = partyv.Value.Parent.ChildRemoved:connect(function (child)
 			print"CHILD REMOVED PARTY MEMBER"
 			resetparty()
+			if partyv.Value.Parent ~= nil then
 			for i,v in pairs(partyv.Value.Parent:GetChildren()) do
 				if v.Name ~= p.Name then
 					addmember(v.Value)
 				end			
+			end
 			end
 		end)
 		-- Child added party member
@@ -217,7 +219,16 @@ c2 = wat.Background.Decline.MouseButton1Down:connect(function ()
 	wat:Destroy()
 end)
 end)
-
+--[[ In case the player leaves(Like a derp)
+game.Players.ChildRemoved:connect(function (person)
+	if person == p then
+		for i,v in pairs(partyv.Value:GetChildren()) do
+			v:Destroy()
+		end
+		partyv.Value:Destroy()
+		reciever:Destroy()
+	end 
+end)]]
 -- UI Menus
 sp.Config.MouseButton1Down:connect(function ()
 	local spm = sp.Config.Menu
